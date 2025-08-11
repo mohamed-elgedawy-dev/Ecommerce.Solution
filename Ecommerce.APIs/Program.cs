@@ -1,5 +1,12 @@
+using Ecommerce.APIs.Errors;
+using Ecommerce.APIs.Helper;
+using Ecommerce.APIs.MiddleWares;
+using Ecommerce.Core.RepositoriesContract;
+using Ecommerce.Repository;
 using Ecommerce.Repository.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Ecommerce.APIs
 {
@@ -7,10 +14,10 @@ namespace Ecommerce.APIs
     {
         public static async  Task Main(string[] args)
         {
-            #region Configure Serves
+          
             var webApplicationBuilder = WebApplication.CreateBuilder(args);
 
-            
+            #region Configure Serves
 
             // Add services to the container.
 
@@ -22,11 +29,34 @@ namespace Ecommerce.APIs
             webApplicationBuilder.Services.AddDbContext<StoreContext>(options=> 
             options.UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("DefaultConnection")));
 
+            webApplicationBuilder.Services.AddScoped(typeof(IGenericRepositories<>), typeof(GenericRepositories<>));
+            webApplicationBuilder.Services.AddAutoMapper(typeof(MappingProfile));
+
+            webApplicationBuilder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = actionContext =>
+                {
+                    var errors = actionContext.ModelState
+                        .Where(e => e.Value.Errors.Count > 0)
+                        .SelectMany(x => x.Value.Errors)
+                        .Select(x => x.ErrorMessage)
+                        .ToArray();
+
+                    var errorResponse = new ApiValidationerrorResponse()
+                    {
+                        Errors = errors
+                    };
+
+                    return new BadRequestObjectResult(errorResponse);
+                };
+            });
+
+
 
 
             #endregion
 
-           
+
 
 
 
@@ -55,17 +85,21 @@ namespace Ecommerce.APIs
 
             }
 
+            
+
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            app.UseMiddleware<ExceptionMiddleware>();
 
+            app.UseStatusCodePagesWithReExecute("/errors");
             app.UseHttpsRedirection();
 
-
-
+            app.UseStaticFiles();
             app.MapControllers();
 
             app.Run();

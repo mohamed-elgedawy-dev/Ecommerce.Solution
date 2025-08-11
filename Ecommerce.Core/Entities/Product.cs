@@ -16,6 +16,8 @@ namespace Ecommerce.Core.Entities
         public ProductCategory ProductCategory { get; set; }
         public int BrandId { get; set; }
         public ProductBrand Brand { get; set; }
+
+        
     }
     
     
