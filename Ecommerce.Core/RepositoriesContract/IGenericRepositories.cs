@@ -13,9 +13,9 @@ namespace Ecommerce.Core.RepositoriesContract
 
         Task<T?> GetByIdAsync(int id);
 
-        Task<IEnumerable<T>> GetAllAsync();
-        Task<IEnumerable<T>> GetAllWithSpecAsync(ISpecification<T> spec);
+        Task<IReadOnlyList<T>> GetAllAsync();
+        Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecification<T> spec);
         Task<T?> GetByIdWithSpecAsync( ISpecification<T> spec);
-    
+        Task<int> GetCountWithSpecAsync(ISpecification<T> Spec);
     }
 }

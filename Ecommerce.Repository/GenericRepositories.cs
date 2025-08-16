@@ -20,7 +20,7 @@ namespace Ecommerce.Repository
             _dbcontext = dbcontext;
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IReadOnlyList<T>> GetAllAsync()
         {
             return await _dbcontext.Set<T>().AsNoTracking().ToListAsync();
         }
@@ -31,7 +31,7 @@ namespace Ecommerce.Repository
 
 
 
-        public async Task <IEnumerable <T>> GetAllWithSpecAsync( ISpecification<T> spec )
+        public async Task <IReadOnlyList <T>> GetAllWithSpecAsync( ISpecification<T> spec )
         {
             return await ApplySpecification(spec).ToListAsync();
         }
@@ -58,9 +58,10 @@ namespace Ecommerce.Repository
 
         }
 
-      
-
-     
+        public async Task <int> GetCountWithSpecAsync(ISpecification<T> Spec)
+        {
+            return await ApplySpecification(Spec).CountAsync();
+        }
     }
 
 }

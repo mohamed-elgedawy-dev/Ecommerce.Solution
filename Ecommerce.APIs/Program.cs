@@ -1,4 +1,5 @@
 using Ecommerce.APIs.Errors;
+using Ecommerce.APIs.Extensions;
 using Ecommerce.APIs.Helper;
 using Ecommerce.APIs.MiddleWares;
 using Ecommerce.Core.RepositoriesContract;
@@ -23,35 +24,13 @@ namespace Ecommerce.APIs
 
             webApplicationBuilder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            webApplicationBuilder.Services.AddEndpointsApiExplorer();
-            webApplicationBuilder.Services.AddSwaggerGen();
 
+            webApplicationBuilder.Services.AddSwaggerServices();
             webApplicationBuilder.Services.AddDbContext<StoreContext>(options=> 
             options.UseSqlServer(webApplicationBuilder.Configuration.GetConnectionString("DefaultConnection")));
 
-            webApplicationBuilder.Services.AddScoped(typeof(IGenericRepositories<>), typeof(GenericRepositories<>));
-            webApplicationBuilder.Services.AddAutoMapper(typeof(MappingProfile));
 
-            webApplicationBuilder.Services.Configure<ApiBehaviorOptions>(options =>
-            {
-                options.InvalidModelStateResponseFactory = actionContext =>
-                {
-                    var errors = actionContext.ModelState
-                        .Where(e => e.Value.Errors.Count > 0)
-                        .SelectMany(x => x.Value.Errors)
-                        .Select(x => x.ErrorMessage)
-                        .ToArray();
-
-                    var errorResponse = new ApiValidationerrorResponse()
-                    {
-                        Errors = errors
-                    };
-
-                    return new BadRequestObjectResult(errorResponse);
-                };
-            });
-
-
+            webApplicationBuilder.Services.AddApplicationServices();
 
 
             #endregion
@@ -91,8 +70,7 @@ namespace Ecommerce.APIs
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerMiddlewares();
             }
             app.UseMiddleware<ExceptionMiddleware>();
 

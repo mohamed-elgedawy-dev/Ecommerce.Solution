@@ -11,9 +11,45 @@ namespace Ecommerce.Repository
 {
     public class ProductTypeBrand : BaseSpecification<Product>
     {
-        public ProductTypeBrand():base()
+        public ProductTypeBrand(ProductSpecParams specParams) 
+            :base(p => 
+            
+            (!specParams.BrandId.HasValue||p.BrandId== specParams.BrandId.Value)&&
+            (!specParams.CategoryId.HasValue||p.CategoryId== specParams.CategoryId.Value)
+            
+            )
         {
             addInclude();
+
+            if (!string.IsNullOrEmpty( specParams.sort))
+            {
+
+                switch ( specParams.sort) 
+                {
+                    case "priceAce":
+
+                        AddOrderBy(p => p.Price);
+                        break;
+                    case "priceDesc":
+
+                        AddOrderByDesc(p => p.Price);
+                        break;
+                    default:
+                        orderBy = p => p.Name;
+                        break;
+
+
+
+
+
+                }
+            }
+            else
+                AddOrderBy(p => p.Name);
+
+
+            ApplyPaging((specParams.PageIndex - 1) * specParams.PageSize, specParams.PageSize);
+
         }
 
 
@@ -28,6 +64,10 @@ namespace Ecommerce.Repository
         {
             includes.Add(p =>p.Brand);
             includes.Add(p => p.ProductCategory);
+
+
+            
+
 
         }
 

@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace Ecommerce.APIs.MiddleWares
 {
-    public class ExceptionMiddleware
+    public class ExceptionMiddleware 
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<ExceptionMiddleware> _logger;

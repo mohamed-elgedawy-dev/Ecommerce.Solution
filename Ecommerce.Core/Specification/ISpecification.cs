@@ -14,5 +14,22 @@ namespace Ecommerce.Core.Specification
 
         public List<Expression<Func<T, object>>> includes { set; get; }
 
+        public Expression<Func <T, object>> orderBy { set; get; }
+        public Expression<Func<T, object>> orderByDesc { set; get; }
+
+        public int Skip { get; set; }
+
+        public int Take { get; set; }
+
+
+        public bool IsPagingEnabled { get; set; }
+
+
+
+
+
+
+
+
     }
 }
